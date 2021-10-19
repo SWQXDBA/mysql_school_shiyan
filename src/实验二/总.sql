@@ -50,3 +50,33 @@ WHERE CNO = 'C002'
                 INNER JOIN student_61 ON sc_61.SNO = student_61.SNO
        WHERE student_61.SNAME = 'xiaohong'
          AND sc_61.CNO = 'C002');*/
+
+# 求其他系中年龄小于“软件工程系”年龄最大者的学生。
+SELECT *
+FROM student_61
+WHERE year(now()) - year(Sage) <
+      (SELECT MAX(year(now()) - year(Sage)) AS 最大年龄 FROM student_61 WHERE SDEPT = '软件工程系')
+#求其他系中比“软件工程系”学生年龄都小的学生。
+SELECT *
+FROM student_61
+WHERE year(now()) - year(Sage) <
+      (SELECT MIN(year(now()) - year(Sage)) AS 最大年龄 FROM student_61 WHERE SDEPT = '软件工程系');
+#查询选修了全部课程的学生的姓名。
+SELECT Sname
+FROM student_61
+WHERE SNO IN ((SELECT SNO
+               FROM sc_61
+               GROUP BY SNO
+               HAVING COUNT(*)
+                          = (SELECT COUNT(*) FROM course_61)));
+#求选修了学号为“S02”的学生所选修的全部课程的学生学号和姓名。P40
+#不存在一个课程 S02选了但是这个学生没选 则这个学生学了S02选的所有课程
+SELECT student_61.SNO 学号, student_61.SNAME 姓名
+FROM student_61
+WHERE NOT EXISTS(SELECT CNO
+                 FROM course_61
+                 WHERE NOT EXISTS(SELECT *
+                                  FROM sc_61
+                                  WHERE SNO = 'S02'
+                                    AND course_61.CNO = sc_61.CNO))
+
