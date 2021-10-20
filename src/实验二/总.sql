@@ -55,7 +55,7 @@ WHERE CNO = 'C002'
 SELECT *
 FROM student_61
 WHERE year(now()) - year(Sage) <
-      (SELECT MAX(year(now()) - year(Sage)) AS 最大年龄 FROM student_61 WHERE SDEPT = '软件工程系')
+      (SELECT MAX(year(now()) - year(Sage)) AS 最大年龄 FROM student_61 WHERE SDEPT = '软件工程系');
 #求其他系中比“软件工程系”学生年龄都小的学生。
 SELECT *
 FROM student_61
@@ -70,13 +70,23 @@ WHERE SNO IN ((SELECT SNO
                HAVING COUNT(*)
                           = (SELECT COUNT(*) FROM course_61)));
 #求选修了学号为“S02”的学生所选修的全部课程的学生学号和姓名。P40
-#不存在一个课程 S02选了但是这个学生没选 则这个学生学了S02选的所有课程
+#查出选课号在S02学生选的课程中的数据 按照SNO进行分组 然后看看数量和SNO选的数量一不一样
 SELECT student_61.SNO 学号, student_61.SNAME 姓名
 FROM student_61
-WHERE NOT EXISTS(SELECT CNO
-                 FROM course_61
-                 WHERE NOT EXISTS(SELECT *
-                                  FROM sc_61
-                                  WHERE SNO = 'S02'
-                                    AND course_61.CNO = sc_61.CNO))
+WHERE student_61.SNO IN
+      (SELECT SNO
+       FROM sc_61
+       WHERE SNO != 'S02'
+         AND CNO IN (SELECT CNO FROM sc_61 WHERE SNO = 'S02')
+       GROUP BY SNO
+       having COUNT(*) = (SELECT COUNT(*) FROM sc_61 WHERE SNO = 'S02'));
+#求学生的学号、姓名、选修的课程名及成绩。
+SELECT student_61.SNO 学号, student_61.SNAME 姓名 ,c.CNAME 课程名,s.GRADE 成绩
+FROM student_61
+         INNER JOIN sc_61 s on student_61.SNO = s.SNO
+         INNER JOIN course_61 c on s.CNO = c.CNO;
 
+#表示学生和课程之间的自然连接、左外部连接和右外部连接。
+select* from student_61  inner join sc_61 s on student_61.SNO = s.SNO;
+select* from student_61  left outer join sc_61 s on student_61.SNO = s.SNO;
+select* from student_61  right outer  join sc_61 s on student_61.SNO = s.SNO;
