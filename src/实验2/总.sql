@@ -87,6 +87,6 @@ FROM student_61
          INNER JOIN course_61 c on s.CNO = c.CNO;
 
 #表示学生和课程之间的自然连接、左外部连接和右外部连接。
-select* from student_61  inner join sc_61 s on student_61.SNO = s.SNO;
-select* from student_61  left outer join sc_61 s on student_61.SNO = s.SNO;
-select* from student_61  right outer  join sc_61 s on student_61.SNO = s.SNO;
+select* from student_61  inner join sc_61 s on student_61.SNO = s.SNO inner join course_61 c on s.CNO = c.CNO;
+select* from student_61  inner join sc_61 s on student_61.SNO = s.SNO left outer join course_61 c on s.CNO = c.CNO;
+select* from student_61  inner join sc_61 s on student_61.SNO = s.SNO left outer join course_61 c on s.CNO = c.CNO;
